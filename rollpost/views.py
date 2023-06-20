@@ -1,4 +1,3 @@
-
 from rest_framework.views import APIView
 from rollpost.serializers import PostSerializer, AuthorSerializer, ThreadPostSerializer, CommentSerializer, \
     CommentReplySerializer, ReportAdminSerializer
@@ -7,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rollpost.models import Posts, ThreadPost, Comment, CommentReply, ReportAdmin
 from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import  MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import json
@@ -15,14 +14,13 @@ import base64
 import uuid
 
 
-# Create your views here.
 class Upload(APIView):
     permission_classes = [IsAuthenticated]
     parser_classess = [MultiPartParser, FormParser]
 
     def post(self, request, format=None):
-        data = request.data.get("image")
-        if not data == "":
+        data = request.data['post']
+        if not data[0]["image"] == "":
             predata: list = list()
             predata = data
             newdata: list = list()
