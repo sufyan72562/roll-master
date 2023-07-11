@@ -43,7 +43,7 @@ class Upload(APIView):
 
 
 class Uploadthread(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     parser_classess = [MultiPartParser, FormParser]
 
     def post(self, request, format=None):
@@ -53,7 +53,7 @@ class Uploadthread(APIView):
         temp.pop(0)
         data = temp
         print(data)
-        if not data[1]["image"] == "":
+        if not data[0]["image"] == "":
             predata: list = list()
             predata = data
             newdata: list = list()

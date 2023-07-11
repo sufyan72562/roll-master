@@ -1,7 +1,9 @@
 from django.urls import path
-from .views import UserChatRoom,DeleteMessageVIew
 
+from rollchat.views import ConversationListAPIView, MessagesView, DeleteMessageView
 urlpatterns = [
-    path('userchat/<str:id>', UserChatRoom.as_view(), name='userchat'),
-    path('delete-message/<int:id>', DeleteMessageVIew.as_view(), name='deletemessage'),
+    path('conversations/', ConversationListAPIView.as_view(), name='conversation-list'),
+    path('messages/<str:conversation_id>', MessagesView.as_view(), name='message-list'),
+    path('delete_message/<int:id>', DeleteMessageView.as_view(), name='delete-message'),
+
 ]

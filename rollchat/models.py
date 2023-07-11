@@ -2,22 +2,24 @@ from django.db import models
 from rolluser.models import User
 
 
-# Create your models here.
-
-def upload_to(instance, filename):
-    return 'chat/{filename}'.format(filename=filename)
-
-
-class Chat(models.Model):
-    content = models.TextField(default="")
-    imaage = models.TextField(blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    room = models.ForeignKey('ChatRoom', on_delete=models.CASCADE)
-
-
-class ChatRoom(models.Model):
-    name = models.CharField(max_length=255, default="")
+class Conversation(models.Model):
+    participants = models.ManyToManyField(User, related_name='conversations')
 
     def __str__(self):
-        return self.name
+        return f'Conversation {self.pk}'
+
+    objects = models.Manager()
+
+
+class Message(models.Model):
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    image = models.TextField(blank=True, null=True)
+    is_seen = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Message {self.pk}'
+
+    objects = models.Manager()

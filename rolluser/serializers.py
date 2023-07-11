@@ -51,3 +51,9 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'image')
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'image', 'username']

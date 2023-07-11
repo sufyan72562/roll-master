@@ -41,9 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'rolluser.apps.RolluserConfig',
-    'rollchat.apps.RollchatConfig',
-    'rollpost.apps.RollpostConfig'
+    'rolluser',
+    'rollchat',
+    'rollpost'
 ]
 
 MIDDLEWARE = [
@@ -76,6 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rollup.wsgi.application'
 ASGI_APPLICATION = 'rollup.asgi.application'
+# ASGI_APPLICATION = 'rollup.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
@@ -101,7 +102,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 10
 }
 
 # Password validation
