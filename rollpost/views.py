@@ -43,7 +43,7 @@ class Upload(APIView):
 
 
 class Uploadthread(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     parser_classess = [MultiPartParser, FormParser]
 
     def post(self, request, format=None):
@@ -341,3 +341,22 @@ class GetReplyComment(APIView):
         data = CommentReply.objects.all().filter(pk=id)
         serializer = CommentReplySerializer(data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UploadVideo(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            serializer = PostSerializer(data=data, context={'request': request})
+            if serializer.is_valid():
+                serializer.validated_data['user'] = request.user
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors)
+        except Exception as e:
+            print(e)
+            return Response({"status": False, "message": "Invalid input data, Try again"})
+
+

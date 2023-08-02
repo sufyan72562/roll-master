@@ -1,10 +1,11 @@
 from django.urls import path
 from rollpost.views import Upload, Uploadthread, UpdateViews, LikeView, GetLikersView, UploadComment, ReplyComment \
     , CommentView, GetPostView, DeletePostVIew, DeleteReplyCommentVIew, DeleteCommentVIew, ReportAdminView, \
-    AllReportAdminView, GetComment, GetReplyComment
+    AllReportAdminView, GetComment, GetReplyComment, UploadVideo
 
 urlpatterns = [
     path('upload/', Upload.as_view(), name="upload"),
+    path('upload_video/', UploadVideo.as_view(), name="upload-video"),
     path('uploadthread/', Uploadthread.as_view(), name="upload"),
     path('get-post/<int:id>', GetPostView.as_view(), name="getpost"),
     path('updateviews/<int:id>/', UpdateViews.as_view(), name="updateview"),

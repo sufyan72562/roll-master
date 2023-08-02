@@ -54,8 +54,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'sender_info': MessageSerializer(message_obj).data,
-                'message': message,
-                'image': image if image else None,
+                # 'message': message,
+                # 'image': image if image else None,
             }
         )
 

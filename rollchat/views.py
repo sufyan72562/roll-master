@@ -26,7 +26,10 @@ And deployment of application to the server
 """
 
 from .models import Conversation, Message
+from rolluser.models import User
 from .serializers import ConversationSerializer, MessageSerializer
+from django.db.models import Count
+from django.db.models import Prefetch
 
 
 class ConversationListAPIView(generics.ListCreateAPIView):
@@ -36,21 +39,55 @@ class ConversationListAPIView(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            # Create a new conversation and add participants
             participants = request.data.get('participants', [])
-            conversation = Conversation.objects.create()
-            conversation.participants.set(participants)
+            if len(participants) <= 1:
+                response = {"message": "Invalid participant(s)", "status": "false"}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            existing_conversation = self.get_existing_conversation(participants)
 
-            serializer = self.get_serializer(conversation)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if existing_conversation:
+                serializer = self.get_serializer(existing_conversation)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            if self.are_participants_valid(participants):
+                conversation = Conversation.objects.create()
+                conversation.participants.set(participants)
+
+                serializer = self.get_serializer(conversation)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                response = {"message": "Invalid participant(s)", "status": "false"}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            response = {"message": "Couldn't created", "status": "false"}
+            response = {"message": "Couldn't create conversation", "status": "false"}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_existing_conversation(self, participants):
+        existing_conversations = Conversation.objects.annotate(participant_count=Count('participants')).filter(
+            participant_count=len(participants))
+        for conversation in existing_conversations:
+            if list(conversation.participants.values_list('id', flat=True)) == participants:
+                return conversation
+        return None
+
+    def are_participants_valid(self, participants):
+        # Check if all participants exist in the database
+        user_ids = [participant for participant in participants if User.objects.filter(pk=participant).exists()]
+        return len(user_ids) == len(participants)
+
+
+    def get_queryset(self):
+        # Prefetch the related messages and sender objects to optimize queries
+        current_user = self.request.user
+        queryset = Conversation.objects.prefetch_related(
+            Prefetch('messages', queryset=Message.objects.order_by('-timestamp'))
+        ).filter(participants__in=[current_user])
+        return queryset
 
     def list(self, request, *args, **kwargs):
         try:
-            queryset = self.get_queryset()
+            queryset = self.filter_queryset(self.get_queryset())
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
